@@ -202,8 +202,13 @@ body.ar .input-field{text-align:right;}
   </div>
   <div id="proofSection" style="display:none">
     <div class="info-note" style="border-color:rgba(37,211,102,.4);background:rgba(37,211,102,.06);color:#7ee8a2" id="proofNote">
-      📸 Après confirmation, envoyez votre capture Bankily/Masrivi au +222 34 42 01 01 sur WhatsApp.
+      📱 Effectuez votre virement <strong>Bankily</strong> au <strong>+222 32 88 08 86</strong><br>puis envoyez la capture d'écran au <strong>+222 27 17 91 61</strong> sur WhatsApp.
     </div>
+  </div>
+
+  <!-- Assistance -->
+  <div style="background:rgba(58,123,213,.08);border:1px solid rgba(58,123,213,.3);border-radius:10px;padding:12px 14px;font-size:12px;color:#7eb8f7;line-height:1.7;margin-bottom:4px;">
+    ❓ <strong>Besoin d'aide ?</strong> Appelez-nous au <strong>+222 27 17 91 61</strong>
   </div>
   <div class="divider"></div>
   <div class="section-label" id="locLabel">Votre localisation</div>
@@ -231,7 +236,12 @@ body.ar .input-field{text-align:right;}
     <div class="tracking-id-hint" id="trackingHint">Utilisez ce code pour suivre votre commande</div>
   </div>
   <div class="confirm-box" id="confirmSummary"></div>
-  <div id="bankilyReminder" style="display:none;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.4);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#7ee8a2;line-height:1.7"></div>
+  <div id="bankilyReminder" style="display:none;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.4);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#7ee8a2;line-height:1.7">
+    📱 Virement Bankily au <strong>+222 32 88 08 86</strong> puis envoyez la capture au <strong>+222 27 17 91 61</strong> sur WhatsApp.
+  </div>
+  <div style="background:rgba(58,123,213,.08);border:1px solid rgba(58,123,213,.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#7eb8f7;text-align:center;line-height:1.8">
+    ❓ Besoin d'aide ? <strong>+222 27 17 91 61</strong>
+  </div>
   <button class="btn-primary" onclick="goTo(5)" style="background:var(--blue);color:#fff" id="btnGoTrack">📦 Suivre ma commande</button>
   <button class="btn-secondary" onclick="resetAll()" id="btnNewOrder">🔄 Nouvelle commande</button>
 </div>
@@ -621,7 +631,9 @@ function renderTracking(order,container){
   });
   let items=order.items.map(it=>'<div class="tracking-item-row"><span>'+it.name+' × '+it.qty+'</span><span>'+it.subtotal+' MRU</span></div>').join('');
   items+='<div class="tracking-item-row"><span>'+t('totalPaye')+'</span><span>'+order.total+' MRU</span></div>';
-  container.innerHTML='<div class="tracking-order-box"><div class="tracking-order-title">'+order.date+' · '+order.time+'</div><div style="font-size:13px;color:var(--text);margin-bottom:4px">👤 '+order.clientName+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px">💳 '+order.paiement+'</div>'+items+'</div><div class="tracking-timeline">'+tl+'</div>';
+  const livreurHtml=order.livreur?'<div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">🛵 Votre livreur</div><div style="font-size:14px;font-weight:700;color:var(--text);">👤 '+order.livreur.nom+'</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#a78bfa;margin-top:4px;">📞 '+order.livreur.tel+'</div></div>':'';
+  const assistanceHtml='<div style="background:rgba(58,123,213,.08);border:1px solid rgba(58,123,213,.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#7eb8f7;text-align:center;">❓ Besoin d\'aide ? <strong>+222 27 17 91 61</strong></div>';
+  container.innerHTML='<div class="tracking-order-box"><div class="tracking-order-title">'+order.date+' · '+order.time+'</div><div style="font-size:13px;color:var(--text);margin-bottom:4px">👤 '+order.clientName+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px">💳 '+order.paiement+'</div>'+items+'</div>'+livreurHtml+assistanceHtml+'<div class="tracking-timeline">'+tl+'</div>';
 }
 
 function watchActiveOrder(code){
