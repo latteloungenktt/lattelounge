@@ -53,7 +53,29 @@ body.ar{font-family:'Noto Sans Arabic',sans-serif;direction:rtl;}
 .install-hint{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
 .install-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;margin-left:auto;}
 
-/* ── STEPS ── */
+/* ── ORDER TYPE ── */
+.order-type-wrap{padding:20px;}
+.order-type-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);text-align:center;margin-bottom:6px;font-weight:700;}
+.order-type-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;font-style:italic;}
+.order-type-grid{display:flex;flex-direction:column;gap:14px;}
+.order-type-btn{display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--white);border:2px solid var(--border);border-radius:16px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;text-align:left;}
+.order-type-btn:active{transform:scale(.98);}
+.order-type-btn.selected{border-color:var(--navy);background:rgba(27,42,74,.04);box-shadow:0 4px 16px rgba(27,42,74,.1);}
+.order-type-icon{font-size:36px;flex-shrink:0;width:52px;height:52px;background:var(--cream2);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.order-type-btn.selected .order-type-icon{background:var(--navy);font-size:32px;}
+.order-type-info{}
+.order-type-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--navy);}
+.order-type-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.order-type-check{margin-left:auto;width:24px;height:24px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.order-type-btn.selected .order-type-check{background:var(--navy);border-color:var(--navy);color:var(--gold2);font-size:13px;}
+.btn-order-type-continue{width:100%;padding:16px;background:var(--navy);border:none;border-radius:14px;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--gold2);cursor:pointer;transition:all .2s;letter-spacing:1px;margin-top:24px;border:1px solid var(--gold);opacity:.4;}
+.btn-order-type-continue:not(:disabled){opacity:1;}
+.btn-order-type-continue:disabled{cursor:not-allowed;}
+
+/* ── ORDER TYPE BADGE ── */
+.order-type-badge{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:var(--gold2);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.5px;}
+
+
 .steps{display:flex;justify-content:center;align-items:center;padding:14px 16px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,42,74,.08);}
 .step{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;}
 .step-num{width:28px;height:28px;border-radius:50%;background:var(--cream2);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .3s;border:2px solid transparent;}
@@ -246,20 +268,60 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 
 <!-- STEPS -->
 <div class="steps">
-  <div class="step"><div class="step-num active" id="sn1">1</div><div class="step-label active" id="sl1">Menu</div></div>
+  <div class="step"><div class="step-num active" id="sn0">1</div><div class="step-label active" id="sl0">Type</div></div>
+  <div class="step-line" id="line0"></div>
+  <div class="step"><div class="step-num" id="sn1">2</div><div class="step-label" id="sl1">Menu</div></div>
   <div class="step-line" id="line1"></div>
-  <div class="step"><div class="step-num" id="sn2">2</div><div class="step-label" id="sl2">Panier</div></div>
+  <div class="step"><div class="step-num" id="sn2">3</div><div class="step-label" id="sl2">Panier</div></div>
   <div class="step-line" id="line2"></div>
-  <div class="step"><div class="step-num" id="sn3">3</div><div class="step-label" id="sl3">Infos</div></div>
+  <div class="step"><div class="step-num" id="sn3">4</div><div class="step-label" id="sl3">Infos</div></div>
   <div class="step-line" id="line3"></div>
-  <div class="step"><div class="step-num" id="sn4">4</div><div class="step-label" id="sl4">Suivi</div></div>
+  <div class="step"><div class="step-num" id="sn4">5</div><div class="step-label" id="sl4">Suivi</div></div>
+</div>
+
+<!-- PAGE 0: TYPE DE COMMANDE -->
+<div class="page active" id="page0">
+  <div class="order-type-wrap">
+    <div class="order-type-title" id="orderTypeTitle">Bienvenue !</div>
+    <div class="order-type-sub" id="orderTypeSub">Comment souhaitez-vous recevoir votre commande ?</div>
+    <div class="order-type-grid">
+      <div class="order-type-btn" id="typeSurPlace" onclick="selectOrderType('sur_place')">
+        <div class="order-type-icon">🪑</div>
+        <div class="order-type-info">
+          <div class="order-type-name" id="typeSurPlaceName">Sur place</div>
+          <div class="order-type-desc" id="typeSurPlaceDesc">Dégustez votre commande dans notre restaurant</div>
+        </div>
+        <div class="order-type-check" id="checkSurPlace"></div>
+      </div>
+      <div class="order-type-btn" id="typeEmporter" onclick="selectOrderType('emporter')">
+        <div class="order-type-icon">🥡</div>
+        <div class="order-type-info">
+          <div class="order-type-name" id="typeEmporterName">À emporter</div>
+          <div class="order-type-desc" id="typeEmporterDesc">Récupérez votre commande au restaurant</div>
+        </div>
+        <div class="order-type-check" id="checkEmporter"></div>
+      </div>
+      <div class="order-type-btn" id="typeLivraison" onclick="selectOrderType('livraison')">
+        <div class="order-type-icon">🛵</div>
+        <div class="order-type-info">
+          <div class="order-type-name" id="typeLivraisonName">Livraison</div>
+          <div class="order-type-desc" id="typeLivraisonDesc">Faites livrer votre commande à domicile</div>
+        </div>
+        <div class="order-type-check" id="checkLivraison"></div>
+      </div>
+    </div>
+    <button class="btn-order-type-continue" id="btnOrderTypeContinue" onclick="goTo(1)" disabled id="btnOrderTypeContinue">Continuer →</button>
+  </div>
 </div>
 
 <!-- PAGE 1: MENU -->
-<div class="page active" id="page1">
+<div class="page" id="page1">
   <div class="menu-header">
-    <div class="menu-header-title" id="menuTitle">Notre Menu</div>
-    <button class="btn-track-small" onclick="goTo(5)" id="btnTrack">📦 Suivi</button>
+    <div>
+      <div class="order-type-badge" id="orderTypeBadge" style="display:none;margin-bottom:6px;"></div>
+      <div class="menu-header-title" id="menuTitle">Notre Menu</div>
+    </div>
+    <button class="btn-track-small" onclick="goTo(6)" id="btnTrack">📦 Suivi</button>
   </div>
   <div class="cat-scroll" id="catTabs"></div>
   <div id="menuContent"></div>
@@ -325,7 +387,7 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 </div>
 
 <!-- PAGE 4: CONFIRMATION -->
-<div class="page" id="page4">
+<div class="page" id="page5">
   <div class="confirm-wrap">
     <div class="confirm-icon">🎉</div>
     <div class="confirm-title" id="confirmTitle">Commande Envoyée !</div>
@@ -340,13 +402,13 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
       📸 Après l'envois de votre commande, envoyez votre capture Bankily/Masrivi au <strong>+222 27 17 91 61</strong> sur WhatsApp pour confirmer la commande.
     </div>
     <div class="assist-note" style="margin-bottom:16px">❓ Besoin d'aide ? <strong>+222 27 17 91 61</strong></div>
-    <button class="btn-primary" onclick="goTo(5)" style="background:var(--gold);color:var(--navy);border-color:var(--gold)" id="btnGoTrack">📦 Suivre ma commande</button>
+    <button class="btn-primary" onclick="goTo(6)" style="background:var(--gold);color:var(--navy);border-color:var(--gold)" id="btnGoTrack">📦 Suivre ma commande</button>
     <button class="btn-secondary" onclick="resetAll()" id="btnNewOrder">🔄 Nouvelle commande</button>
   </div>
 </div>
 
 <!-- PAGE 5: SUIVI -->
-<div class="page" id="page5">
+<div class="page" id="page6">
   <div class="tracking-wrap">
     <div class="page-title" id="trackTitle" style="padding:0 0 16px;">📦 Suivi de Commande</div>
     <div class="track-search">
@@ -529,9 +591,43 @@ const CAT_IMAGES={
 };
 
 const RESTO_LAT=18.12925,RESTO_LNG=-16.00351;
-let lang='fr',panier={},currentPage=1,payMode=null,locationData=null,currentTrackingKey=null,trackingUnsub=null;
+let lang='fr',panier={},currentPage=0,payMode=null,locationData=null,currentTrackingKey=null,trackingUnsub=null;
+let orderType=null; // 'sur_place' | 'emporter' | 'livraison'
+
+// ── ORDER TYPE ──
+window.selectOrderType=function(type){
+  orderType=type;
+  ['sur_place','emporter','livraison'].forEach(t=>{
+    document.getElementById('type'+t.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join('')).classList.toggle('selected',t===type);
+    document.getElementById('check'+t.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join('')).textContent=t===type?'✓':'';
+  });
+  // Fix IDs
+  document.getElementById('typeSurPlace').classList.toggle('selected',type==='sur_place');
+  document.getElementById('typeEmporter').classList.toggle('selected',type==='emporter');
+  document.getElementById('typeLivraison').classList.toggle('selected',type==='livraison');
+  document.getElementById('checkSurPlace').textContent=type==='sur_place'?'✓':'';
+  document.getElementById('checkEmporter').textContent=type==='emporter'?'✓':'';
+  document.getElementById('checkLivraison').textContent=type==='livraison'?'✓':'';
+  document.getElementById('btnOrderTypeContinue').disabled=false;
+  // Update location section visibility - hide for sur_place and emporter
+  updateLocationVisibility();
+};
 
 function t(k){return T[lang][k]||T.fr[k]||k;}
+
+function updateLocationVisibility(){
+  const locSection=document.getElementById('locLabel')?.parentElement;
+  if(!orderType||orderType==='livraison'){
+    document.getElementById('locLabel').style.display='';
+    document.getElementById('locBtn').style.display='';
+    document.getElementById('locInfo').style.display='';
+  } else {
+    // Sur place ou emporter - cacher la localisation
+    document.getElementById('deliveryBox').style.display='none';
+    locationData={lat:0,lng:0,distance:0,fraisLivraison:0};
+    checkConfirmBtn();
+  }
+}
 
 // ── LANG ──
 window.setLang=function(l){
@@ -638,16 +734,37 @@ window.goTo=function(page){
   currentPage=page;
   document.getElementById('page'+currentPage).classList.add('active');
   window.scrollTo(0,0);updateSteps(page);
+  // Show badge on menu
+  if(page===1){
+    const badge=document.getElementById('orderTypeBadge');
+    const icons={sur_place:'🪑',emporter:'🥡',livraison:'🛵'};
+    const names={sur_place:lang==='ar'?'في المطعم':'Sur place',emporter:lang==='ar'?'للأخذ':'À emporter',livraison:lang==='ar'?'توصيل':'Livraison'};
+    if(orderType){badge.style.display='inline-flex';badge.textContent=icons[orderType]+' '+names[orderType];}
+  }
   if(page===2)renderCart();
-  if(page===3)checkConfirmBtn();
-  if(page===5&&currentTrackingKey)searchOrder(currentTrackingKey);
+  if(page===3){
+    // Si pas livraison, pas besoin de GPS
+    if(orderType!=='livraison'&&!locationData){locationData={lat:0,lng:0,distance:0,fraisLivraison:0};}
+    const showLoc=orderType==='livraison';
+    document.getElementById('locLabel').style.display=showLoc?'':'none';
+    document.getElementById('locBtn').style.display=showLoc?'':'none';
+    document.getElementById('locInfo').style.display=showLoc?'':'none';
+    if(!showLoc)document.getElementById('deliveryBox').style.display='none';
+    checkConfirmBtn();
+  }
+  if(page===6&&currentTrackingKey)searchOrder(currentTrackingKey);
 };
 
 function updateSteps(p){
-  for(let i=1;i<=4;i++){
-    document.getElementById('sn'+i).className='step-num'+(i<p?' done':i===p?' active':'');
-    document.getElementById('sl'+i).className='step-label'+(i===p?' active':'');
-    if(i<4)document.getElementById('line'+i).className='step-line'+(i<p?' done':'');
+  // 0=Type,1=Menu,2=Panier,3=Infos,4=Confirm/Suivi
+  const active=p<=4?p:4;
+  for(let i=0;i<=4;i++){
+    const sn=document.getElementById('sn'+i);
+    const sl=document.getElementById('sl'+i);
+    if(!sn||!sl)continue;
+    sn.className='step-num'+(i<active?' done':i===active?' active':'');
+    sl.className='step-label'+(i===active?' active':'');
+    if(i<4){const ln=document.getElementById('line'+i);if(ln)ln.className='step-line'+(i<active?' done':'');}
   }
 }
 
@@ -728,6 +845,7 @@ window.confirmOrder=async function(){
   const order={
     trackingCode,status:'envoye',timestamp:now.toISOString(),
     time:pad(now.getHours())+':'+pad(now.getMinutes()),date:now.toLocaleDateString('fr-FR'),
+    typeCommande:orderType,
     clientName:document.getElementById('clientName').value.trim(),
     clientPhone:document.getElementById('clientPhone').value.trim(),
     items:Object.entries(panier).map(([name,{price,qty}])=>({name,price,qty,subtotal:price*qty})),
@@ -801,12 +919,12 @@ function watchActiveOrder(code){
     const name=sn[order.status]||order.status;
     const color=order.status==='annule'?'var(--red)':order.status==='livre'?'var(--green)':'var(--gold)';
     banner.style.display='flex';banner.style.borderColor=color;
-    banner.innerHTML='<div style="flex:1"><div style="font-size:11px;color:rgba(255,255,255,.5)">#'+order.trackingCode+'</div><div style="font-size:14px;font-weight:700;color:'+color+'">'+icon+' '+name+'</div></div><button onclick="goTo(5)" style="background:'+color+';border:none;border-radius:8px;color:var(--navy);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;">'+(lang==='ar'?'عرض ←':'Voir →')+'</button>';
+    banner.innerHTML='<div style="flex:1"><div style="font-size:11px;color:rgba(255,255,255,.5)">#'+order.trackingCode+'</div><div style="font-size:14px;font-weight:700;color:'+color+'">'+icon+' '+name+'</div></div><button onclick="goTo(6)" style="background:'+color+';border:none;border-radius:8px;color:var(--navy);font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;">'+(lang==='ar'?'عرض ←':'Voir →')+'</button>';
   });
 }
 
 window.resetAll=function(){
-  panier={};payMode=null;locationData=null;
+  panier={};payMode=null;locationData=null;orderType=null;
   document.getElementById('notesInput').value='';
   document.getElementById('clientName').value='';
   document.getElementById('clientPhone').value='';
@@ -817,8 +935,16 @@ window.resetAll=function(){
   document.getElementById('payBankily').classList.remove('selected');
   document.getElementById('payLivraison').classList.remove('selected');
   document.getElementById('deliveryBox').style.display='none';
+  document.getElementById('orderTypeBadge').style.display='none';
+  document.getElementById('btnOrderTypeContinue').disabled=true;
+  ['typeSurPlace','typeEmporter','typeLivraison'].forEach(id=>{
+    document.getElementById(id).classList.remove('selected');
+  });
+  ['checkSurPlace','checkEmporter','checkLivraison'].forEach(id=>{
+    document.getElementById(id).textContent='';
+  });
   document.getElementById('menuContent').querySelectorAll('.item-row').forEach(r=>{r.classList.remove('selected');const b=r.querySelector('.item-badge');if(b)b.remove();});
-  updateCartBar();goTo(1);
+  updateCartBar();goTo(0);
 };
 
 applyT();
