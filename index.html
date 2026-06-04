@@ -443,6 +443,11 @@ const T={
     heroSub:'Route de Nouadhibou · Nouakchott',heroTag:'Commandez en ligne, livré chez vous',
     installTitle:"Ajouter à l'écran d'accueil",installHint:'Appuyez sur ⎋ Partager → "Sur l\'écran d\'accueil"',
     sl1:'Menu',sl2:'Panier',sl3:'Infos',sl4:'Suivi',menuTitle:'Notre Menu',btnTrack:'📦 Suivi',
+    orderTypeTitle:'Bienvenue !',orderTypeSub:'Comment souhaitez-vous recevoir votre commande ?',
+    surPlaceName:'Sur place',surPlaceDesc:'Dégustez votre commande dans notre restaurant',
+    emporterName:'À emporter',emporterDesc:'Récupérez votre commande au restaurant',
+    livraisonName:'Livraison',livraisonDesc:'Faites livrer votre commande à domicile',
+    continuerBtn:'Continuer →',
     cartTitle:'🛒 Votre Panier',cartTotalLbl:'Sous-total',btnContinue:'Continuer →',btnModify:'← Modifier',
     infoTitle:'📋 Vos Informations',coordLabel:'Vos coordonnées',namePH:'Votre nom complet',phonePH:'Votre numéro de téléphone',
     payLabel:'Mode de paiement',payBankilyLbl:'Bankily / Masrivi',payBankilySub:'Virement mobile',
@@ -483,6 +488,11 @@ const T={
     heroSub:'طريق نواذيبو · نواكشوط',heroTag:'اطلب عبر الإنترنت، نوصل إليك',
     installTitle:'أضف إلى الشاشة الرئيسية',installHint:'اضغط على مشاركة ثم "إلى الشاشة الرئيسية"',
     sl1:'القائمة',sl2:'السلة',sl3:'المعلومات',sl4:'التتبع',menuTitle:'قائمتنا',btnTrack:'📦 تتبع',
+    orderTypeTitle:'أهلاً بك !',orderTypeSub:'كيف تريد استلام طلبك ؟',
+    surPlaceName:'في المطعم',surPlaceDesc:'تناول طلبك في مطعمنا',
+    emporterName:'للأخذ',emporterDesc:'استلم طلبك من المطعم',
+    livraisonName:'توصيل',livraisonDesc:'نوصل طلبك إلى منزلك',
+    continuerBtn:'متابعة ←',
     cartTitle:'🛒 سلتك',cartTotalLbl:'المجموع الفرعي',btnContinue:'متابعة ←',btnModify:'تعديل →',
     infoTitle:'📋 معلوماتك',coordLabel:'بياناتك',namePH:'اسمك الكامل',phonePH:'رقم هاتفك',
     payLabel:'طريقة الدفع',payBankilyLbl:'Bankily / Masrivi',payBankilySub:'تحويل مصرفي',
@@ -517,6 +527,48 @@ const T={
       "🍔 Burgers":"🍔 برغر","🌯 Snacks":"🌯 سناكس","🥪 Club Sandwich":"🥪 كلوب ساندويش",
       "🍗 Viandes":"🍗 لحوم ودجاج","🫕 Tajines":"🫕 طاجين","🦐 Mer":"🦐 مأكولات بحرية",
       "🥗 Salades":"🥗 سلطات","🍝 Pâtes":"🍝 معكرونة","🌅 Petits Déj":"🌅 إفطار","🍳 Omelettes":"🍳 أومليت"
+    },
+    items:{
+      "Expresso":"إسبريسو","Café Nous Nous":"قهوة نص نص","Double Expresso":"إسبريسو دبل",
+      "Café au Lait":"قهوة بالحليب","Cappuccino":"كابوتشينو","Chocolat Chaud":"شوكولاتة ساخنة",
+      "Café Latte":"لاتيه","Café Crème":"قهوة كريم","Ice Coffee Au Chocolat":"قهوة مثلجة بالشوكولاتة",
+      "Ice Coffee Au Caramel":"قهوة مثلجة بالكراميل","Café Americano":"أمريكانو",
+      "The Lipton ou Marocain":"شاي ليبتون أو مغربي","The au Citron":"شاي بالليمون","The Lipton Lait":"شاي ليبتون بالحليب",
+      "Jus D'Orange":"عصير برتقال","Jus De Citron":"عصير ليمون","Jus De Pomme":"عصير تفاح",
+      "Jus D'Avocat":"عصير أفوكادو","Jus De Mangue":"عصير مانجو","Jus De Pastèque":"عصير بطيخ",
+      "Jus D'Ananas":"عصير أناناس","Jus De Kiwi":"عصير كيوي","Jus De Banane":"عصير موز","Jus De Cocktail":"عصير كوكتيل",
+      "Milkshake Fraise":"ميلك شيك فراولة","Milkshake Vanille":"ميلك شيك فانيليا",
+      "Milkshake Chocolat":"ميلك شيك شوكولاتة","Milkshake Lotus ou Oreo":"ميلك شيك لوتس أو أوريو",
+      "Mojito Classic":"موهيتو كلاسيك","Mojito Ananas":"موهيتو أناناس","Mojito Menthe":"موهيتو نعناع",
+      "Mojito Fraise":"موهيتو فراولة","Eau Gazeuse":"مياه غازية","Eau Minérale":"مياه معدنية",
+      "Grande Eau Minérale":"مياه معدنية كبيرة","Coca Cola":"كوكا كولا","Fanta":"فانتا","Sprite":"سبرايت",
+      "Salade De Fruit":"سلطة فواكه","Banana Split":"باناناسبليت","Tiramisu":"تيراميسو","Granola":"غرانولا",
+      "Oreo":"كريب أوريو","Lotus":"كريب لوتس","Nutella Banane":"كريب نوتيلا موز",
+      "Glace Fraise":"آيس كريم فراولة","Glace Vanille":"آيس كريم فانيليا","Glace Chocolat":"آيس كريم شوكولاتة",
+      "Burger Classic":"برغر كلاسيك","Cheeseburger":"تشيزبرغر","Egg Burger":"إيج برغر",
+      "Chicken Burger":"تشيكن برغر","Double Burger":"دبل برغر",
+      "Tacos Viande":"تاكو لحم","Tacos Poulet":"تاكو دجاج",
+      "Baguettino Viande":"باكيتينو لحم","Baguettino Poulet":"باكيتينو دجاج",
+      "Chawarma Viande":"شاورما لحم","Chawarma Poulet":"شاورما دجاج",
+      "Panini Viande":"بانيني لحم","Panini Poulet":"بانيني دجاج",
+      "Sandwich Brochette Viande":"ساندويش برشيت لحم","Sandwich Brochette Poulet":"ساندويش برشيت دجاج",
+      "Sandwich Steack Viande":"ساندويش ستيك لحم","Sandwich Steack Poulet":"ساندويش ستيك دجاج",
+      "Plat De Frites":"طبق بطاطس مقلية",
+      "Club Fromage":"كلوب جبنة","Club Poulet":"كلوب دجاج","Club Viande":"كلوب لحم",
+      "Club Thon":"كلوب تونة","Club Crispy":"كلوب كريسبي",
+      "Demi Poulet":"نصف دجاج","Poulet Complet":"دجاج كامل","Brochette Poulet":"برشيت دجاج",
+      "Basmati Poulet":"أرز بسمتي بالدجاج","Escalope de Poulet":"إسكالوب دجاج",
+      "Cordon Bleu":"كوردون بلو","Steak à l'ancienne":"ستيك تقليدي","Brochette De Bœuf":"برشيت لحم بقري",
+      "Tajine Poulet":"طاجين دجاج","Tajine Viande":"طاجين لحم","Tajine Kefta":"طاجين كفتة",
+      "Brochette Crevette":"برشيت روبيان","Crevettes Pannées":"روبيان مقلي","Crevettes Pli-Pli":"روبيان بلي بلي",
+      "Salade Mixte":"سلطة مشكلة","Salade Niçoise":"سلطة نيسواز","Salade Caesar":"سلطة سيزر","Salade Crevette":"سلطة روبيان",
+      "Spaghetti Bolognaise":"سباغيتي بولونيز","Spaghetti Carbonara":"سباغيتي كربونارا",
+      "Tagliatelle Poulet":"تالياتيلي دجاج","Tagliatelle Viande":"تالياتيلي لحم",
+      "Tagliatelle Fruit De Mer":"تالياتيلي مأكولات بحرية","Lasagne Bolognaise":"لازانيا بولونيز",
+      "Gratin Pomme De Terre":"غراتان البطاطس",
+      "Classic":"إفطار كلاسيك","Petit Dej Enfant":"إفطار أطفال","Complet":"إفطار كامل","Latte Lounge":"إفطار لاتيه لاونج",
+      "Omelette Nature":"أومليت سادة","Omelette Thon":"أومليت تونة","Omelette Fromage":"أومليت جبنة",
+      "Omelette Jambon":"أومليت جامبون","Omelette Jambon Fromage":"أومليت جامبون وجبنة"
     }
   }
 };
@@ -645,6 +697,11 @@ function applyT(){
   const sH=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v;};
   const sP=(id,v)=>{const e=document.getElementById(id);if(e)e.placeholder=v;};
   s('heroSub',tr.heroSub);s('heroTag',tr.heroTag);s('installTitle',tr.installTitle);sH('installHint',tr.installHint);
+  s('orderTypeTitle',tr.orderTypeTitle);s('orderTypeSub',tr.orderTypeSub);
+  s('typeSurPlaceName',tr.surPlaceName);s('typeSurPlaceDesc',tr.surPlaceDesc);
+  s('typeEmporterName',tr.emporterName);s('typeEmporterDesc',tr.emporterDesc);
+  s('typeLivraisonName',tr.livraisonName);s('typeLivraisonDesc',tr.livraisonDesc);
+  s('btnOrderTypeContinue',tr.continuerBtn);
   s('sl1',tr.sl1);s('sl2',tr.sl2);s('sl3',tr.sl3);s('sl4',tr.sl4);
   s('menuTitle',tr.menuTitle);s('btnTrack',tr.btnTrack);
   s('cartTitle',tr.cartTitle);s('cartTotalLbl',tr.cartTotalLbl);s('btnContinue',tr.btnContinue);s('btnModify',tr.btnModify);
@@ -696,9 +753,10 @@ function buildMenu(){
     catHdr.innerHTML='<div class="cat-line"></div><div class="cat-name">'+label+'</div><div class="cat-line-r"></div>';
     leftCol.appendChild(catHdr);
     MENU[cat].forEach(([name,price,desc])=>{
+      const displayName = lang==='ar' ? (T.ar.items[name]||name) : name;
       const row=document.createElement('div'); row.className='item-row'; row.id='row-'+name;
       const sn=name.replace(/'/g,"\\'");
-      row.innerHTML='<div class="item-row-left"><div class="item-row-name">'+name+'</div>'+(desc?'<div class="item-row-desc">'+desc+'</div>':'')+'</div><div class="item-row-right"><div class="item-row-price">'+price+' MRU</div><button class="item-add-btn" onclick="addItem(\''+sn+'\','+price+',this)">+</button></div>';
+      row.innerHTML='<div class="item-row-left"><div class="item-row-name">'+displayName+'</div>'+(desc?'<div class="item-row-desc">'+desc+'</div>':'')+'</div><div class="item-row-right"><div class="item-row-price">'+price+' MRU</div><button class="item-add-btn" onclick="addItem(\''+sn+'\','+price+',this)">+</button></div>';
       leftCol.appendChild(row);
     });
     sideWrap.appendChild(leftCol);
@@ -785,9 +843,10 @@ function renderCart(){
   const div=document.getElementById('cartItems');div.innerHTML='';let total=0;
   Object.entries(panier).forEach(([name,{price,qty}])=>{
     const sub=price*qty;total+=sub;
+    const displayName = lang==='ar' ? (T.ar.items[name]||name) : name;
     const el=document.createElement('div');el.className='cart-item';
     const sn=name.replace(/'/g,"\\'");
-    el.innerHTML='<div class="cart-item-name">'+name+'</div><div class="qty-ctrl"><button class="qty-btn" onclick="cartQty(\''+sn+'\',-1)">−</button><span class="qty-num">'+qty+'</span><button class="qty-btn" onclick="cartQty(\''+sn+'\',1)">+</button></div><div class="cart-item-price">'+sub+' MRU</div>';
+    el.innerHTML='<div class="cart-item-name">'+displayName+'</div><div class="qty-ctrl"><button class="qty-btn" onclick="cartQty(\''+sn+'\',-1)">−</button><span class="qty-num">'+qty+'</span><button class="qty-btn" onclick="cartQty(\''+sn+'\',1)">+</button></div><div class="cart-item-price">'+sub+' MRU</div>';
     div.appendChild(el);
   });
   if(!Object.keys(panier).length)div.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">🛒</div>'+t('cartEmpty')+'</div>';
@@ -881,7 +940,10 @@ window.confirmOrder=async function(){
 
 function renderConfirmSummary(order){
   const div=document.getElementById('confirmSummary');let html='';
-  order.items.forEach(it=>{html+='<div class="confirm-row"><span>'+it.name+' × '+it.qty+'</span><span>'+it.subtotal+' MRU</span></div>';});
+  order.items.forEach(it=>{
+    const displayName = lang==='ar' ? (T.ar.items[it.name]||it.name) : it.name;
+    html+='<div class="confirm-row"><span>'+displayName+' × '+it.qty+'</span><span>'+it.subtotal+' MRU</span></div>';
+  });
   html+='<div class="confirm-row"><span>'+t('sousTotal')+'</span><span>'+order.sousTotal+' MRU</span></div>';
   html+='<div class="confirm-row"><span>🛵 '+t('livraison')+'</span><span>'+order.fraisLivraison+' MRU</span></div>';
   html+='<div class="confirm-row"><span>TOTAL</span><span>'+order.total+' MRU</span></div>';
