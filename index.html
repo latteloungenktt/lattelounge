@@ -875,7 +875,7 @@ window.confirmOrder=async function(){
     currentTrackingKey=trackingCode;
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
     document.getElementById('trackingInput').value=trackingCode;
-    renderConfirmSummary(order);watchActiveOrder(trackingCode);goTo(4);
+    renderConfirmSummary(order);watchActiveOrder(trackingCode);goTo(5);
   }catch(e){alert(t('errSend'));btn.disabled=false;btn.textContent=t('btnConfirm');}
 };
 
