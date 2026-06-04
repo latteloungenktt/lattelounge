@@ -542,9 +542,13 @@ const MENU={
   "🍦 Boules De Glaces":[["Glace Fraise",80,""],["Glace Vanille",80,""],["Glace Chocolat",80,""]],
   "🍔 Burgers":[["Burger Classic",150,""],["Cheeseburger",180,""],["Egg Burger",200,""],["Chicken Burger",180,""],["Double Burger",250,""]],
   "🌯 Snacks":[
-    ["Tacos Viande ou Poulet",150,""],["Baguettino Viande ou Poulet",150,""],
-    ["Chawarma Viande ou Poulet",150,""],["Panini Viande ou Poulet",150,""],
-    ["Sandwich Brochette V/P",200,""],["Sandwich Steack V/P",200,""],
+    ["Tacos Viande",150,""],["Tacos Poulet",150,""],
+    ["Baguettino Viande",150,""],["Baguettino Poulet",150,""],
+    ["Chawarma Viande",150,""],["Chawarma Poulet",150,""],
+    ["Panini Viande",150,""],["Panini Poulet",150,""],
+    ["Sandwich Brochette Viande",200,""],["Sandwich Brochette Poulet",200,""],
+    ["Sandwich Steack Viande",200,""],["Sandwich Steack Poulet",200,""],
+    ["Plat De Frites",60,""],
   ],
   "🥪 Club Sandwich":[["Club Fromage",100,""],["Club Poulet",150,""],["Club Viande",150,""],["Club Thon",150,""],["Club Crispy",200,""]],
   "🍗 Viandes":[
@@ -597,20 +601,17 @@ let orderType=null; // 'sur_place' | 'emporter' | 'livraison'
 // ── ORDER TYPE ──
 window.selectOrderType=function(type){
   orderType=type;
-  ['sur_place','emporter','livraison'].forEach(t=>{
-    document.getElementById('type'+t.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join('')).classList.toggle('selected',t===type);
-    document.getElementById('check'+t.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join('')).textContent=t===type?'✓':'';
-  });
-  // Fix IDs
-  document.getElementById('typeSurPlace').classList.toggle('selected',type==='sur_place');
-  document.getElementById('typeEmporter').classList.toggle('selected',type==='emporter');
-  document.getElementById('typeLivraison').classList.toggle('selected',type==='livraison');
-  document.getElementById('checkSurPlace').textContent=type==='sur_place'?'✓':'';
-  document.getElementById('checkEmporter').textContent=type==='emporter'?'✓':'';
-  document.getElementById('checkLivraison').textContent=type==='livraison'?'✓':'';
-  document.getElementById('btnOrderTypeContinue').disabled=false;
-  // Update location section visibility - hide for sur_place and emporter
-  updateLocationVisibility();
+  // Mettre à jour les boutons
+  document.getElementById('typeSurPlace').classList.toggle('selected', type==='sur_place');
+  document.getElementById('typeEmporter').classList.toggle('selected', type==='emporter');
+  document.getElementById('typeLivraison').classList.toggle('selected', type==='livraison');
+  document.getElementById('checkSurPlace').textContent = type==='sur_place' ? '✓' : '';
+  document.getElementById('checkEmporter').textContent = type==='emporter' ? '✓' : '';
+  document.getElementById('checkLivraison').textContent = type==='livraison' ? '✓' : '';
+  document.getElementById('btnOrderTypeContinue').disabled = false;
+  // Si pas livraison, on initialise locationData vide
+  if(type !== 'livraison') locationData = {lat:0, lng:0, distance:0, fraisLivraison:0};
+  else locationData = null;
 };
 
 function t(k){return T[lang][k]||T.fr[k]||k;}
@@ -869,6 +870,7 @@ window.confirmOrder=async function(){
     localisation,
     notes:document.getElementById('notesInput').value.trim()||'',lang,
   };
+  try{
     await push(ref(db,'commandes'),order);
     currentTrackingKey=trackingCode;
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
