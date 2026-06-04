@@ -842,7 +842,10 @@ window.getLocation=function(){
 window.checkConfirmBtn=function(){
   const name=document.getElementById('clientName').value.trim();
   const phone=document.getElementById('clientPhone').value.trim();
-  document.getElementById('btnConfirm').disabled=!(payMode&&locationData&&name&&phone);
+  // Pour Sur place et À emporter : pas besoin de localisation
+  const needsLocation = orderType === 'livraison';
+  const locationOk = needsLocation ? !!locationData : true;
+  document.getElementById('btnConfirm').disabled=!(payMode && locationOk && name && phone);
 };
 
 // ── CONFIRM ──
@@ -851,7 +854,8 @@ window.confirmOrder=async function(){
   btn.disabled=true;btn.textContent=lang==='ar'?'⏳ جاري الإرسال...':'⏳ Envoi en cours...';
   const now=new Date(),pad=s=>String(s).padStart(2,'0');
   const total=Object.values(panier).reduce((s,{price,qty})=>s+price*qty,0);
-  const frais=locationData?.fraisLivraison||0;
+  const frais = orderType === 'livraison' ? (locationData?.fraisLivraison||0) : 0;
+  const localisation = (orderType === 'livraison' && locationData) ? {lat:locationData.lat,lng:locationData.lng,distance:parseFloat(locationData.distance?.toFixed(1)||0),mapsLink:'https://maps.google.com/?q='+locationData.lat+','+locationData.lng} : null;
   const trackingCode=Math.random().toString(36).substring(2,8).toUpperCase();
   const order={
     trackingCode,status:'envoye',timestamp:now.toISOString(),
@@ -862,10 +866,9 @@ window.confirmOrder=async function(){
     items:Object.entries(panier).map(([name,{price,qty}])=>({name,price,qty,subtotal:price*qty})),
     sousTotal:total,fraisLivraison:frais,total:total+frais,
     paiement:payMode==='bankily'?'Bankily / Masrivi':'À la livraison',
-    localisation:locationData?{lat:locationData.lat,lng:locationData.lng,distance:parseFloat(locationData.distance?.toFixed(1)||0),mapsLink:'https://maps.google.com/?q='+locationData.lat+','+locationData.lng}:null,
+    localisation,
     notes:document.getElementById('notesInput').value.trim()||'',lang,
   };
-  try{
     await push(ref(db,'commandes'),order);
     currentTrackingKey=trackingCode;
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
