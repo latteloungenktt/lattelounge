@@ -238,6 +238,26 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 
 /* ── STATUS BANNER ── */
 #orderStatusBanner{display:none;position:fixed;bottom:90px;left:16px;right:16px;background:var(--navy);border:1px solid var(--gold);border-radius:14px;padding:12px 16px;align-items:center;gap:12px;z-index:55;box-shadow:0 8px 24px rgba(27,42,74,.2);}
+
+/* ── PAGE TABLE NUMBER (Sur place) ── */
+.table-wrap{padding:24px 20px;}
+.table-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--navy);text-align:center;font-weight:700;margin-bottom:6px;}
+.table-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:32px;font-style:italic;}
+.table-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.table-btn{aspect-ratio:1;background:var(--white);border:2px solid var(--border);border-radius:16px;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--navy);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.table-btn:active{transform:scale(.92);}
+.table-btn.selected{background:var(--navy);border-color:var(--gold);color:var(--gold2);box-shadow:0 4px 16px rgba(27,42,74,.25);}
+.table-display{background:var(--white);border:2px solid var(--border);border-radius:20px;padding:20px;text-align:center;margin-bottom:24px;}
+.table-display-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;}
+.table-display-num{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;color:var(--navy);line-height:1;}
+.table-display-num.empty{color:var(--border);}
+
+/* ── SUR PLACE: confirmation screen ── */
+.confirm-table-card{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:20px;border:1px solid var(--gold);}
+.confirm-table-icon{font-size:52px;margin-bottom:10px;}
+.confirm-table-lbl{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;}
+.confirm-table-num{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:700;color:var(--gold2);line-height:1;}
+.surplace-notes-wrap{padding:0 20px 20px;}
 </style>
 </head>
 <body>
@@ -310,7 +330,22 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
         <div class="order-type-check" id="checkLivraison"></div>
       </div>
     </div>
-    <button class="btn-order-type-continue" id="btnOrderTypeContinue" onclick="goTo(1)" disabled id="btnOrderTypeContinue">Continuer →</button>
+    <button class="btn-order-type-continue" id="btnOrderTypeContinue" onclick="handleOrderTypeContinue()" disabled>Continuer →</button>
+  </div>
+</div>
+
+<!-- PAGE 0.5: NUMÉRO DE TABLE (Sur place) -->
+<div class="page" id="pageTable">
+  <div class="table-wrap">
+    <div class="table-title" id="tableTitle">Votre table</div>
+    <div class="table-sub" id="tableSub">Appuyez sur votre numéro de table</div>
+    <div class="table-display">
+      <div class="table-display-lbl" id="tableDisplayLbl">TABLE N°</div>
+      <div class="table-display-num empty" id="tableDisplayNum">—</div>
+    </div>
+    <div class="table-grid" id="tableGrid"></div>
+    <button class="btn-primary" id="btnTableContinue" onclick="confirmTable()" disabled>Confirmer →</button>
+    <button class="btn-secondary" style="margin-top:10px" onclick="goTo(0)" id="btnTableBack">← Retour</button>
   </div>
 </div>
 
@@ -343,47 +378,69 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 
 <!-- PAGE 3: INFOS -->
 <div class="page" id="page3">
-  <div class="page-title" id="infoTitle" style="padding:20px 20px 0;">📋 Vos Informations</div>
-  <div class="infos-wrap">
-    <div class="section-label" id="coordLabel">Vos coordonnées</div>
-    <input class="input-field" type="text" id="clientName" oninput="checkConfirmBtn()">
-    <input class="input-field" type="tel" id="clientPhone" oninput="checkConfirmBtn()">
-    <div class="divider"></div>
-    <div class="section-label" id="payLabel">Mode de paiement</div>
-    <div class="pay-grid">
-      <div class="pay-opt" id="payBankily" onclick="selectPay('bankily')">
-        <div class="pay-opt-icon">📱</div>
-        <div class="pay-opt-label" id="payBankilyLbl">Bankily / Masrivi</div>
-        <div class="pay-opt-sub" id="payBankilySub">Virement mobile</div>
+
+  <!-- ══ SUR PLACE : version allégée ══ -->
+  <div id="infoSurPlace" style="display:none;">
+    <div class="page-title" style="padding:20px 20px 12px;">✅ Récapitulatif</div>
+    <div style="padding:0 20px 20px;">
+      <div class="confirm-table-card">
+        <div class="confirm-table-icon">🪑</div>
+        <div class="confirm-table-lbl" id="tableConfirmLbl">Table numéro</div>
+        <div class="confirm-table-num" id="tableConfirmNum">—</div>
       </div>
-      <div class="pay-opt" id="payLivraison" onclick="selectPay('livraison')">
-        <div class="pay-opt-icon">🚪</div>
-        <div class="pay-opt-label" id="payLivraisonLbl">À la livraison</div>
-        <div class="pay-opt-sub" id="payLivraisonSub">Paiement cash</div>
-      </div>
+      <div class="confirm-card" id="confirmSummarySurPlace" style="margin-bottom:14px;"></div>
+      <div class="section-label" id="notesLabelSP">Notes (optionnel)</div>
+      <textarea class="notes-input" id="notesInputSurPlace" rows="3" placeholder="Ex: sans oignon, allergie..."></textarea>
+      <button class="btn-primary" id="btnConfirmSurPlace" onclick="confirmOrder()">✅ Envoyer ma commande</button>
+      <button class="btn-secondary" style="margin-top:10px;" onclick="goTo(2)" id="btnBackCartSP">← Modifier</button>
     </div>
-    <div id="proofSection" style="display:none">
-      <div class="info-note" id="proofNote">
-        📸 Après l'envois de votre commande, envoyez votre capture Bankily/Masrivi au <strong>+222 27 17 91 61</strong> sur WhatsApp pour confirmer la commande.
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="section-label" id="locLabel">Votre localisation</div>
-    <button class="loc-btn" id="locBtn" onclick="getLocation()"><span>📍</span><span id="locBtnText">Partager ma position GPS</span></button>
-    <div class="loc-info" id="locInfo">Votre position nous permet de calculer les frais de livraison</div>
-    <div class="delivery-box" id="deliveryBox">
-      <div class="delivery-row"><span style="color:var(--muted)" id="distLabel">📍 Distance</span><span class="delivery-val" id="deliveryDist">—</span></div>
-      <div class="delivery-row"><span style="color:var(--muted)" id="feeLabel">🛵 Frais de livraison</span><span class="delivery-val" id="deliveryFee">—</span></div>
-      <div class="delivery-row"><span id="totalPayLabel">Total à payer</span><span class="delivery-grand" id="deliveryGrand">—</span></div>
-    </div>
-    <div class="divider"></div>
-    <div class="section-label" id="notesLabel">Notes (optionnel)</div>
-    <textarea class="notes-input" id="notesInput" rows="3"></textarea>
-    <div class="assist-note">❓ <strong id="assistLabel">Besoin d'aide ?</strong> <span id="assistTel">Appelez-nous au +222 27 17 91 61</span></div>
-    <div style="height:16px"></div>
-    <button class="btn-primary" id="btnConfirm" onclick="confirmOrder()" disabled>✅ Confirmer ma commande</button>
-    <button class="btn-secondary" onclick="goTo(2)" id="btnBackCart">← Retour au panier</button>
   </div>
+
+  <!-- ══ EMPORTER / LIVRAISON : version complète ══ -->
+  <div id="infoOther" style="display:none;">
+    <div class="page-title" id="infoTitle" style="padding:20px 20px 0;">📋 Vos Informations</div>
+    <div class="infos-wrap">
+      <div class="section-label" id="coordLabel">Vos coordonnées</div>
+      <input class="input-field" type="text" id="clientName" oninput="checkConfirmBtn()">
+      <input class="input-field" type="tel" id="clientPhone" oninput="checkConfirmBtn()">
+      <div class="divider"></div>
+      <div class="section-label" id="payLabel">Mode de paiement</div>
+      <div class="pay-grid">
+        <div class="pay-opt" id="payBankily" onclick="selectPay('bankily')">
+          <div class="pay-opt-icon">📱</div>
+          <div class="pay-opt-label" id="payBankilyLbl">Bankily / Masrivi</div>
+          <div class="pay-opt-sub" id="payBankilySub">Virement mobile</div>
+        </div>
+        <div class="pay-opt" id="payLivraison" onclick="selectPay('livraison')">
+          <div class="pay-opt-icon">🚪</div>
+          <div class="pay-opt-label" id="payLivraisonLbl">À la livraison</div>
+          <div class="pay-opt-sub" id="payLivraisonSub">Paiement cash</div>
+        </div>
+      </div>
+      <div id="proofSection" style="display:none">
+        <div class="info-note" id="proofNote">
+          📸 Après l'envois de votre commande, envoyez votre capture Bankily/Masrivi au <strong>+222 27 17 91 61</strong> sur WhatsApp pour confirmer la commande.
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label" id="locLabel">Votre localisation</div>
+      <button class="loc-btn" id="locBtn" onclick="getLocation()"><span>📍</span><span id="locBtnText">Partager ma position GPS</span></button>
+      <div class="loc-info" id="locInfo">Votre position nous permet de calculer les frais de livraison</div>
+      <div class="delivery-box" id="deliveryBox">
+        <div class="delivery-row"><span style="color:var(--muted)" id="distLabel">📍 Distance</span><span class="delivery-val" id="deliveryDist">—</span></div>
+        <div class="delivery-row"><span style="color:var(--muted)" id="feeLabel">🛵 Frais de livraison</span><span class="delivery-val" id="deliveryFee">—</span></div>
+        <div class="delivery-row"><span id="totalPayLabel">Total à payer</span><span class="delivery-grand" id="deliveryGrand">—</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label" id="notesLabel">Notes (optionnel)</div>
+      <textarea class="notes-input" id="notesInput" rows="3"></textarea>
+      <div class="assist-note">❓ <strong id="assistLabel">Besoin d'aide ?</strong> <span id="assistTel">Appelez-nous au +222 27 17 91 61</span></div>
+      <div style="height:16px"></div>
+      <button class="btn-primary" id="btnConfirm" onclick="confirmOrder()" disabled>✅ Confirmer ma commande</button>
+      <button class="btn-secondary" onclick="goTo(2)" id="btnBackCart">← Retour au panier</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- PAGE 4: CONFIRMATION -->
@@ -649,11 +706,12 @@ const CAT_IMAGES={
 const RESTO_LAT=18.12925,RESTO_LNG=-16.00351;
 let lang='fr',panier={},currentPage=0,payMode=null,locationData=null,currentTrackingKey=null,trackingUnsub=null;
 let orderType=null; // 'sur_place' | 'emporter' | 'livraison'
+let tableNumber=null; // numéro de table pour 'sur_place'
+const NB_TABLES=20; // nombre de tables du restaurant
 
 // ── ORDER TYPE ──
 window.selectOrderType=function(type){
   orderType=type;
-  // Mettre à jour les boutons
   document.getElementById('typeSurPlace').classList.toggle('selected', type==='sur_place');
   document.getElementById('typeEmporter').classList.toggle('selected', type==='emporter');
   document.getElementById('typeLivraison').classList.toggle('selected', type==='livraison');
@@ -661,9 +719,50 @@ window.selectOrderType=function(type){
   document.getElementById('checkEmporter').textContent = type==='emporter' ? '✓' : '';
   document.getElementById('checkLivraison').textContent = type==='livraison' ? '✓' : '';
   document.getElementById('btnOrderTypeContinue').disabled = false;
-  // Si pas livraison, on initialise locationData vide
   if(type !== 'livraison') locationData = {lat:0, lng:0, distance:0, fraisLivraison:0};
   else locationData = null;
+};
+
+window.handleOrderTypeContinue=function(){
+  if(!orderType)return;
+  if(orderType==='sur_place'){
+    // → page Table
+    document.getElementById('page0').classList.remove('active');
+    currentPage='Table';
+    buildTableGrid();
+    document.getElementById('pageTable').classList.add('active');
+    window.scrollTo(0,0);updateSteps('Table');
+  } else {
+    goTo(1);
+  }
+};
+
+// ── TABLE NUMBER ──
+function buildTableGrid(){
+  const grid=document.getElementById('tableGrid');
+  if(!grid||grid.children.length>0)return; // déjà construit
+  for(let i=1;i<=NB_TABLES;i++){
+    const btn=document.createElement('button');
+    btn.className='table-btn';btn.textContent=i;
+    btn.onclick=()=>selectTable(i);
+    grid.appendChild(btn);
+  }
+}
+
+window.selectTable=function(n){
+  tableNumber=n;
+  // Update UI
+  document.querySelectorAll('.table-btn').forEach(b=>{
+    b.classList.toggle('selected', parseInt(b.textContent)===n);
+  });
+  const disp=document.getElementById('tableDisplayNum');
+  disp.textContent=n;disp.classList.remove('empty');
+  document.getElementById('btnTableContinue').disabled=false;
+};
+
+window.confirmTable=function(){
+  if(!tableNumber)return;
+  goTo(1); // → menu
 };
 
 function t(k){return T[lang][k]||T.fr[k]||k;}
@@ -798,36 +897,92 @@ function updateCartBar(){
 }
 
 // ── NAV ──
+// Pages: 0=Type, 'Table'=Table#, 1=Menu, 2=Panier, 3=Infos, 5=Confirm, 6=Suivi
+function getPageEl(page){
+  return page==='Table' ? document.getElementById('pageTable') : document.getElementById('page'+page);
+}
+
 window.goTo=function(page){
   if(page===2&&!Object.keys(panier).length){alert(t('errEmpty'));return;}
-  document.getElementById('page'+currentPage).classList.remove('active');
+
+  // Intercept: Type → si sur_place → page Table d'abord
+  if(page===1 && orderType==='sur_place' && currentPage===0){
+    // Aller vers la page Table
+    getPageEl(currentPage).classList.remove('active');
+    currentPage='Table';
+    buildTableGrid();
+    getPageEl('Table').classList.add('active');
+    window.scrollTo(0,0);updateSteps('Table');
+    return;
+  }
+
+  // Retour depuis pageTable vers page 0
+  if(page===0 && currentPage==='Table'){
+    getPageEl('Table').classList.remove('active');
+    currentPage=0;
+    getPageEl(0).classList.add('active');
+    window.scrollTo(0,0);updateSteps(0);
+    return;
+  }
+
+  getPageEl(currentPage).classList.remove('active');
   currentPage=page;
-  document.getElementById('page'+currentPage).classList.add('active');
+  getPageEl(currentPage).classList.add('active');
   window.scrollTo(0,0);updateSteps(page);
-  // Show badge on menu
+
+  // Badge sur le menu
   if(page===1){
     const badge=document.getElementById('orderTypeBadge');
     const icons={sur_place:'🪑',emporter:'🥡',livraison:'🛵'};
     const names={sur_place:lang==='ar'?'في المطعم':'Sur place',emporter:lang==='ar'?'للأخذ':'À emporter',livraison:lang==='ar'?'توصيل':'Livraison'};
-    if(orderType){badge.style.display='inline-flex';badge.textContent=icons[orderType]+' '+names[orderType];}
+    if(orderType){badge.style.display='inline-flex';badge.textContent=icons[orderType]+' '+names[orderType]+(orderType==='sur_place'&&tableNumber?' — Table '+tableNumber:'');}
   }
+
   if(page===2)renderCart();
+
   if(page===3){
-    // Si pas livraison, pas besoin de GPS
-    if(orderType!=='livraison'&&!locationData){locationData={lat:0,lng:0,distance:0,fraisLivraison:0};}
-    const showLoc=orderType==='livraison';
-    document.getElementById('locLabel').style.display=showLoc?'':'none';
-    document.getElementById('locBtn').style.display=showLoc?'':'none';
-    document.getElementById('locInfo').style.display=showLoc?'':'none';
-    if(!showLoc)document.getElementById('deliveryBox').style.display='none';
-    checkConfirmBtn();
+    if(orderType==='sur_place'){
+      // Afficher version allégée
+      document.getElementById('infoSurPlace').style.display='block';
+      document.getElementById('infoOther').style.display='none';
+      // Afficher le numéro de table et le récap
+      document.getElementById('tableConfirmNum').textContent=tableNumber||'—';
+      renderSurPlaceSummary();
+    } else {
+      document.getElementById('infoSurPlace').style.display='none';
+      document.getElementById('infoOther').style.display='block';
+      if(orderType!=='livraison'&&!locationData)locationData={lat:0,lng:0,distance:0,fraisLivraison:0};
+      const showLoc=orderType==='livraison';
+      document.getElementById('locLabel').style.display=showLoc?'':'none';
+      document.getElementById('locBtn').style.display=showLoc?'':'none';
+      document.getElementById('locInfo').style.display=showLoc?'':'none';
+      if(!showLoc)document.getElementById('deliveryBox').style.display='none';
+      checkConfirmBtn();
+    }
   }
+
   if(page===6&&currentTrackingKey)searchOrder(currentTrackingKey);
 };
 
+function renderSurPlaceSummary(){
+  const div=document.getElementById('confirmSummarySurPlace');
+  if(!div)return;
+  const total=Object.values(panier).reduce((s,{price,qty})=>s+price*qty,0);
+  let html='';
+  Object.entries(panier).forEach(([name,{price,qty}])=>{
+    const displayName=lang==='ar'?(T.ar.items[name]||name):name;
+    html+='<div class="confirm-row"><span>'+displayName+' × '+qty+'</span><span>'+(price*qty)+' MRU</span></div>';
+  });
+  html+='<div class="confirm-row"><span>TOTAL</span><span>'+total+' MRU</span></div>';
+  div.innerHTML=html;
+}
+
 function updateSteps(p){
-  // 0=Type,1=Menu,2=Panier,3=Infos,4=Confirm/Suivi
-  const active=p<=4?p:4;
+  // Mapping page → step index (0=Type, Table→0.5≈1, 1=Menu, 2=Panier, 3=Infos, 5=Confirm)
+  const pageToStep={'Table':1, 0:0, 1:2, 2:3, 3:4, 5:5, 6:5};
+  // Steps bar: Type | Table | Menu | Panier | Confirmé  (pour sur_place)
+  // Steps bar: Type | Menu | Panier | Infos | Confirmé  (pour autres)
+  const active = typeof pageToStep[p]!=='undefined' ? pageToStep[p] : 0;
   for(let i=0;i<=4;i++){
     const sn=document.getElementById('sn'+i);
     const sl=document.getElementById('sl'+i);
@@ -835,6 +990,13 @@ function updateSteps(p){
     sn.className='step-num'+(i<active?' done':i===active?' active':'');
     sl.className='step-label'+(i===active?' active':'');
     if(i<4){const ln=document.getElementById('line'+i);if(ln)ln.className='step-line'+(i<active?' done':'');}
+  }
+  // Update step labels for sur_place
+  if(orderType==='sur_place'){
+    const labels=lang==='ar'
+      ?['النوع','الطاولة','القائمة','السلة','تأكيد']
+      :['Type','Table','Menu','Panier','Envoyé'];
+    labels.forEach((lbl,i)=>{const el=document.getElementById('sl'+i);if(el)el.textContent=lbl;});
   }
 }
 
@@ -900,55 +1062,88 @@ window.getLocation=function(){
 };
 
 window.checkConfirmBtn=function(){
+  if(orderType==='sur_place')return; // sur place: toujours actif (bouton dédié)
   const name=document.getElementById('clientName').value.trim();
   const phone=document.getElementById('clientPhone').value.trim();
-  // Pour Sur place et À emporter : pas besoin de localisation
-  const needsLocation = orderType === 'livraison';
+  const needsLocation = orderType==='livraison';
   const locationOk = needsLocation ? !!locationData : true;
-  document.getElementById('btnConfirm').disabled=!(payMode && locationOk && name && phone);
+  const btn=document.getElementById('btnConfirm');
+  if(btn)btn.disabled=!(payMode&&locationOk&&name&&phone);
 };
 
 // ── CONFIRM ──
 window.confirmOrder=async function(){
-  const btn=document.getElementById('btnConfirm');
-  btn.disabled=true;btn.textContent=lang==='ar'?'⏳ جاري الإرسال...':'⏳ Envoi en cours...';
+  const isSurPlace = orderType==='sur_place';
+
+  // Identifier le bon bouton selon le mode
+  const btn = isSurPlace
+    ? document.getElementById('btnConfirmSurPlace')
+    : document.getElementById('btnConfirm');
+  if(btn){btn.disabled=true;btn.textContent=lang==='ar'?'⏳ جاري الإرسال...':'⏳ Envoi en cours...';}
+
   const now=new Date(),pad=s=>String(s).padStart(2,'0');
   const total=Object.values(panier).reduce((s,{price,qty})=>s+price*qty,0);
-  const frais = orderType === 'livraison' ? (locationData?.fraisLivraison||0) : 0;
-  const localisation = (orderType === 'livraison' && locationData) ? {lat:locationData.lat,lng:locationData.lng,distance:parseFloat(locationData.distance?.toFixed(1)||0),mapsLink:'https://maps.google.com/?q='+locationData.lat+','+locationData.lng} : null;
+  const frais = orderType==='livraison' ? (locationData?.fraisLivraison||0) : 0;
+  const localisation = (orderType==='livraison'&&locationData) ? {lat:locationData.lat,lng:locationData.lng,distance:parseFloat(locationData.distance?.toFixed(1)||0),mapsLink:'https://maps.google.com/?q='+locationData.lat+','+locationData.lng} : null;
   const trackingCode=Math.random().toString(36).substring(2,8).toUpperCase();
+
   const order={
-    trackingCode,status:'envoye',timestamp:now.toISOString(),
-    time:pad(now.getHours())+':'+pad(now.getMinutes()),date:now.toLocaleDateString('fr-FR'),
+    trackingCode,
+    status:'envoye',
+    timestamp:now.toISOString(),
+    time:pad(now.getHours())+':'+pad(now.getMinutes()),
+    date:now.toLocaleDateString('fr-FR'),
     typeCommande:orderType,
-    clientName:document.getElementById('clientName').value.trim(),
-    clientPhone:document.getElementById('clientPhone').value.trim(),
     items:Object.entries(panier).map(([name,{price,qty}])=>({name,price,qty,subtotal:price*qty})),
-    sousTotal:total,fraisLivraison:frais,total:total+frais,
-    paiement:payMode==='bankily'?'Bankily / Masrivi':'À la livraison',
-    localisation,
-    notes:document.getElementById('notesInput').value.trim()||'',lang,
+    sousTotal:total,
+    fraisLivraison:frais,
+    total:total+frais,
+    lang,
   };
+
+  // Données spécifiques selon le mode
+  if(isSurPlace){
+    order.tableNumber = tableNumber;
+    order.notes = document.getElementById('notesInputSurPlace').value.trim()||'';
+    order.paiement = 'Sur place';
+    order.clientName = 'Table '+tableNumber;
+    order.clientPhone = '';
+  } else {
+    order.clientName = document.getElementById('clientName').value.trim();
+    order.clientPhone = document.getElementById('clientPhone').value.trim();
+    order.paiement = payMode==='bankily'?'Bankily / Masrivi':'À la livraison';
+    order.notes = document.getElementById('notesInput').value.trim()||'';
+    order.localisation = localisation;
+  }
+
   try{
     await push(ref(db,'commandes'),order);
     currentTrackingKey=trackingCode;
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
     document.getElementById('trackingInput').value=trackingCode;
-    renderConfirmSummary(order);watchActiveOrder(trackingCode);goTo(5);
-  }catch(e){alert(t('errSend'));btn.disabled=false;btn.textContent=t('btnConfirm');}
+    renderConfirmSummary(order);
+    watchActiveOrder(trackingCode);
+    goTo(5);
+  }catch(e){
+    alert(t('errSend'));
+    if(btn){btn.disabled=false;btn.textContent=isSurPlace?'✅ Envoyer ma commande':t('btnConfirm');}
+  }
 };
 
 function renderConfirmSummary(order){
   const div=document.getElementById('confirmSummary');let html='';
+  if(order.typeCommande==='sur_place'){
+    html+='<div class="confirm-row" style="font-size:15px;"><span>🪑 Table</span><span style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:700;color:var(--navy)">'+order.tableNumber+'</span></div>';
+  }
   order.items.forEach(it=>{
     const displayName = lang==='ar' ? (T.ar.items[it.name]||it.name) : it.name;
     html+='<div class="confirm-row"><span>'+displayName+' × '+it.qty+'</span><span>'+it.subtotal+' MRU</span></div>';
   });
-  html+='<div class="confirm-row"><span>'+t('sousTotal')+'</span><span>'+order.sousTotal+' MRU</span></div>';
-  html+='<div class="confirm-row"><span>🛵 '+t('livraison')+'</span><span>'+order.fraisLivraison+' MRU</span></div>';
   html+='<div class="confirm-row"><span>TOTAL</span><span>'+order.total+' MRU</span></div>';
+  if(order.notes)html+='<div class="confirm-row" style="font-size:12px;color:var(--muted)"><span>📝 Notes</span><span>'+order.notes+'</span></div>';
   div.innerHTML=html;
-  document.getElementById('bankilyReminder').style.display=order.paiement.includes('Bankily')?'block':'none';
+  const br=document.getElementById('bankilyReminder');
+  if(br)br.style.display=(order.paiement&&order.paiement.includes('Bankily'))?'block':'none';
 }
 
 // ── TRACKING ──
@@ -1002,19 +1197,33 @@ function watchActiveOrder(code){
 }
 
 window.resetAll=function(){
-  panier={};payMode=null;locationData=null;orderType=null;
-  document.getElementById('notesInput').value='';
-  document.getElementById('clientName').value='';
-  document.getElementById('clientPhone').value='';
-  document.getElementById('locBtn').classList.remove('got');
-  document.getElementById('locBtnText').textContent=t('locBtnText');
-  document.getElementById('locInfo').textContent=t('locInfo');
-  document.getElementById('proofSection').style.display='none';
-  document.getElementById('payBankily').classList.remove('selected');
-  document.getElementById('payLivraison').classList.remove('selected');
-  document.getElementById('deliveryBox').style.display='none';
+  panier={};payMode=null;locationData=null;orderType=null;tableNumber=null;
+
+  // Reset champs communs
+  const ni=document.getElementById('notesInput');if(ni)ni.value='';
+  const nisp=document.getElementById('notesInputSurPlace');if(nisp)nisp.value='';
+  const cn=document.getElementById('clientName');if(cn)cn.value='';
+  const cp=document.getElementById('clientPhone');if(cp)cp.value='';
+  const lb=document.getElementById('locBtn');if(lb)lb.classList.remove('got');
+  const lbt=document.getElementById('locBtnText');if(lbt)lbt.textContent=t('locBtnText');
+  const li=document.getElementById('locInfo');if(li)li.textContent=t('locInfo');
+  const ps=document.getElementById('proofSection');if(ps)ps.style.display='none';
+  const pb=document.getElementById('payBankily');if(pb)pb.classList.remove('selected');
+  const pl=document.getElementById('payLivraison');if(pl)pl.classList.remove('selected');
+  const db2=document.getElementById('deliveryBox');if(db2)db2.style.display='none';
   document.getElementById('orderTypeBadge').style.display='none';
   document.getElementById('btnOrderTypeContinue').disabled=true;
+
+  // Reset table grid
+  const tdisp=document.getElementById('tableDisplayNum');
+  if(tdisp){tdisp.textContent='—';tdisp.classList.add('empty');}
+  const tbtn=document.getElementById('btnTableContinue');if(tbtn)tbtn.disabled=true;
+  document.querySelectorAll('.table-btn').forEach(b=>b.classList.remove('selected'));
+
+  // Reset page infos
+  document.getElementById('infoSurPlace').style.display='none';
+  document.getElementById('infoOther').style.display='none';
+
   ['typeSurPlace','typeEmporter','typeLivraison'].forEach(id=>{
     document.getElementById(id).classList.remove('selected');
   });
@@ -1022,7 +1231,16 @@ window.resetAll=function(){
     document.getElementById(id).textContent='';
   });
   document.getElementById('menuContent').querySelectorAll('.item-row').forEach(r=>{r.classList.remove('selected');const b=r.querySelector('.item-badge');if(b)b.remove();});
-  updateCartBar();goTo(0);
+  updateCartBar();
+
+  // Si on était sur pageTable, retour propre
+  if(currentPage==='Table'){
+    document.getElementById('pageTable').classList.remove('active');
+    currentPage=0;
+    document.getElementById('page0').classList.add('active');
+  } else {
+    goTo(0);
+  }
 };
 
 applyT();
