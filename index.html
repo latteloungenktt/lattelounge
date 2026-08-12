@@ -1087,6 +1087,7 @@ window.confirmOrder=async function(){
   const localisation = (orderType==='livraison'&&locationData) ? {lat:locationData.lat,lng:locationData.lng,distance:parseFloat(locationData.distance?.toFixed(1)||0),mapsLink:'https://maps.google.com/?q='+locationData.lat+','+locationData.lng} : null;
   const trackingCode=Math.random().toString(36).substring(2,8).toUpperCase();
 
+  // ── Objet commande principal (pour tracking)
   const order={
     trackingCode,
     status:'envoye',
@@ -1116,8 +1117,28 @@ window.confirmOrder=async function(){
     order.localisation = localisation;
   }
 
+  // ── Objet au format attendu par la caisse (commandes_serveuse)
+  // La caisse attend : { serveuse, tableNum, items:[{name,price,qty,subtotal}], total, notes, fromWeb }
+  const caisseOrder = {
+    serveuse: isSurPlace ? 'Table '+tableNumber : (order.clientName||'Client web'),
+    tableNum: isSurPlace ? tableNumber : null,
+    items: order.items,
+    total: order.total,
+    notes: order.notes||'',
+    time: order.time,
+    date: order.date,
+    typeCommande: orderType,
+    trackingCode,
+    fromWeb: true,  // distingue les commandes web des commandes serveuse physique
+  };
+
   try{
-    await push(ref(db,'commandes'),order);
+    // 1. Envoyer à la CAISSE via commandes_serveuse (notification immédiate)
+    await push(ref(db,'commandes_serveuse'), caisseOrder);
+
+    // 2. Envoyer dans commandes pour le tracking côté client
+    await push(ref(db,'commandes'), order);
+
     currentTrackingKey=trackingCode;
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
     document.getElementById('trackingInput').value=trackingCode;
