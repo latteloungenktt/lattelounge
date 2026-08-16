@@ -1238,6 +1238,8 @@ window.confirmOrder=async function(){
     await push(ref(db,'commandes'),order);
 
     currentTrackingKey=trackingCode;
+    // Persister le tracking code → survit au rafraîchissement
+    localStorage.setItem('ll_tracking', trackingCode);
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
     document.getElementById('trackingInput').value=trackingCode;
     renderConfirmSummary(order);
@@ -1333,6 +1335,8 @@ function watchActiveOrder(code){
 
 window.resetAll=function(){
   panier={};payMode=null;locationData=null;orderType=null;tableNumber=null;
+  // Effacer le tracking persisté → le client repart de zéro
+  localStorage.removeItem('ll_tracking');
 
   // Reset champs communs
   const ni=document.getElementById('notesInput');if(ni)ni.value='';
@@ -1380,6 +1384,38 @@ window.resetAll=function(){
 
 applyT();
 buildMenu();
+
+// ── PERSISTANCE : si le client rafraîchit après une commande, on le redirige vers son suivi ──
+(function checkPersistentOrder(){
+  const saved = localStorage.getItem('ll_tracking');
+  if(!saved) return;
+  // Vérifier que la commande existe et n'est pas terminée
+  const q = query(ref(db,'commandes'), orderByChild('trackingCode'), equalTo(saved));
+  onValue(q, snap => {
+    if(!snap.exists()){
+      localStorage.removeItem('ll_tracking');
+      return;
+    }
+    const order = Object.values(snap.val())[0];
+    // Si commande livrée ou annulée → effacer et laisser sur la page d'accueil
+    if(order.status === 'livre' || order.status === 'annule'){
+      localStorage.removeItem('ll_tracking');
+      return;
+    }
+    // Commande encore active → aller directement au suivi
+    currentTrackingKey = saved;
+    document.getElementById('trackingInput').value = saved;
+    // Afficher un bandeau d'info avant de rediriger
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--navy);border-bottom:2px solid var(--gold);padding:12px 20px;z-index:999;display:flex;align-items:center;justify-content:space-between;font-size:13px;';
+    banner.innerHTML = `
+      <span>📦 Vous avez une commande en cours <strong style="color:var(--gold2)">#${saved}</strong></span>
+      <button onclick="goTo(6);this.parentElement.remove();" style="background:var(--gold);border:none;border-radius:8px;color:var(--navy);font-weight:700;padding:6px 14px;cursor:pointer;font-size:12px;">Suivre →</button>
+    `;
+    document.body.appendChild(banner);
+    watchActiveOrder(saved);
+  }, {onlyOnce: true});
+})();
 </script>
 </body>
 </html>
