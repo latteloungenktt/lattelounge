@@ -487,13 +487,6 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 <!-- STATUS BANNER -->
 <div id="orderStatusBanner"></div>
 
-<!-- CART BAR -->
-<div class="cart-bar" id="cartBar" onclick="goTo(2)">
-  <span class="cart-bar-qty" id="cartBarQty">0 article</span>
-  <span class="cart-bar-label" id="cartBarLabel">Voir le panier →</span>
-  <span class="cart-bar-total" id="cartBarTotal">0 MRU</span>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -1238,8 +1231,11 @@ window.confirmOrder=async function(){
     await push(ref(db,'commandes'),order);
 
     currentTrackingKey=trackingCode;
-    // Persister le tracking code → survit au rafraîchissement
-    localStorage.setItem('ll_tracking', trackingCode);
+    // Persister le tracking code pendant 4 heures maximum
+    localStorage.setItem('ll_tracking', JSON.stringify({
+      code: trackingCode,
+      savedAt: Date.now()
+    }));
     document.getElementById('trackingIdDisplay').textContent=trackingCode;
     document.getElementById('trackingInput').value=trackingCode;
     renderConfirmSummary(order);
@@ -1385,26 +1381,59 @@ window.resetAll=function(){
 applyT();
 buildMenu();
 
-// ── PERSISTANCE : si le client rafraîchit après une commande, on le redirige vers son suivi ──
+// ── PERSISTANCE : le suivi est conservé pendant 4 heures maximum ──
 (function checkPersistentOrder(){
-  const saved = localStorage.getItem('ll_tracking');
-  if(!saved) return;
+  const STORAGE_KEY = 'll_tracking';
+  const EXPIRY_MS = 4 * 60 * 60 * 1000; // 4 heures
+
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+
+  let savedData;
+  try{
+    savedData = JSON.parse(raw);
+  }catch(e){
+    // Ancien format non horodaté : on le supprime pour éviter une conservation illimitée.
+    localStorage.removeItem(STORAGE_KEY);
+    return;
+  }
+
+  const saved = savedData && savedData.code;
+  const savedAt = Number(savedData && savedData.savedAt);
+
+  if(!saved || !savedAt || (Date.now() - savedAt) >= EXPIRY_MS){
+    localStorage.removeItem(STORAGE_KEY);
+    return;
+  }
+
+  // Effacer automatiquement la donnée à l'expiration, même si la page reste ouverte.
+  window.setTimeout(function(){
+    const currentRaw = localStorage.getItem(STORAGE_KEY);
+    if(currentRaw === raw){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, Math.max(0, EXPIRY_MS - (Date.now() - savedAt)));
+
   // Vérifier que la commande existe et n'est pas terminée
   const q = query(ref(db,'commandes'), orderByChild('trackingCode'), equalTo(saved));
   onValue(q, snap => {
     if(!snap.exists()){
-      localStorage.removeItem('ll_tracking');
+      localStorage.removeItem(STORAGE_KEY);
       return;
     }
+
     const order = Object.values(snap.val())[0];
+
     // Si commande livrée ou annulée → effacer et laisser sur la page d'accueil
     if(order.status === 'livre' || order.status === 'annule'){
-      localStorage.removeItem('ll_tracking');
+      localStorage.removeItem(STORAGE_KEY);
       return;
     }
+
     // Commande encore active → aller directement au suivi
     currentTrackingKey = saved;
     document.getElementById('trackingInput').value = saved;
+
     // Afficher un bandeau d'info avant de rediriger
     const banner = document.createElement('div');
     banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--navy);border-bottom:2px solid var(--gold);padding:12px 20px;z-index:999;display:flex;align-items:center;justify-content:space-between;font-size:13px;';
