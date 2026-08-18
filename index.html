@@ -258,6 +258,34 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
 .confirm-table-lbl{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;}
 .confirm-table-num{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:700;color:var(--gold2);line-height:1;}
 .surplace-notes-wrap{padding:0 20px 20px;}
+
+/* ── MENU CONTINUE BUTTON ── */
+.menu-continue-bar{
+  position:fixed;
+  bottom:16px;
+  left:16px;
+  right:16px;
+  display:none;
+  z-index:60;
+}
+.menu-continue-bar.visible{
+  display:block;
+  animation:popUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+.menu-continue-btn{
+  width:100%;
+  padding:15px 20px;
+  background:var(--navy);
+  color:var(--gold2);
+  border:1px solid var(--gold);
+  border-radius:16px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 32px rgba(27,42,74,.3);
+  letter-spacing:.5px;
+}
 </style>
 </head>
 <body>
@@ -482,6 +510,13 @@ body.ar .notes-input{text-align:right;font-family:'Noto Sans Arabic',sans-serif;
     <div id="trackingResult"></div>
     <button class="btn-secondary" onclick="goTo(1)" style="margin-top:16px" id="btnBackMenu">← Retour au menu</button>
   </div>
+</div>
+
+<!-- MENU CONTINUE BUTTON -->
+<div class="menu-continue-bar" id="menuContinueBar">
+  <button class="menu-continue-btn" onclick="goTo(2)" id="menuContinueBtn">
+    Continuer vers le panier →
+  </button>
 </div>
 
 <!-- STATUS BANNER -->
@@ -966,12 +1001,18 @@ window.addItem=function(name,price,btn){
 
 function updateCartBar(){
   const items=Object.entries(panier);
-  const qty=items.reduce((s,[,v])=>s+v.qty,0),price=items.reduce((s,[,v])=>s+v.price*v.qty,0);
-  const bar=document.getElementById('cartBar');
-  if(!qty){bar.classList.remove('visible');return;}
+  const qty=items.reduce((s,[,v])=>s+v.qty,0);
+  const bar=document.getElementById('menuContinueBar');
+  const btn=document.getElementById('menuContinueBtn');
+  if(!bar)return;
+  if(!qty){
+    bar.classList.remove('visible');
+    return;
+  }
   bar.classList.add('visible');
-  document.getElementById('cartBarQty').textContent=qty+(qty>1?' articles':' article');
-  document.getElementById('cartBarTotal').textContent=price+' MRU';
+  if(btn){
+    btn.textContent=lang==='ar'?'متابعة إلى السلة ←':'Continuer vers le panier →';
+  }
 }
 
 // ── NAV ──
@@ -1007,6 +1048,15 @@ window.goTo=function(page){
   currentPage=page;
   getPageEl(currentPage).classList.add('active');
   window.scrollTo(0,0);updateSteps(page);
+
+  const menuContinueBar=document.getElementById('menuContinueBar');
+  if(menuContinueBar){
+    if(page===1 && Object.keys(panier).length){
+      menuContinueBar.classList.add('visible');
+    }else{
+      menuContinueBar.classList.remove('visible');
+    }
+  }
 
   // Badge sur le menu
   if(page===1){
@@ -1367,6 +1417,8 @@ window.resetAll=function(){
   });
   document.getElementById('menuContent').querySelectorAll('.item-row').forEach(r=>{r.classList.remove('selected');const b=r.querySelector('.item-badge');if(b)b.remove();});
   updateCartBar();
+  const menuContinueBar=document.getElementById('menuContinueBar');
+  if(menuContinueBar)menuContinueBar.classList.remove('visible');
 
   // Si on était sur pageTable, retour propre
   if(currentPage==='Table'){
